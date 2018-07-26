@@ -58,7 +58,7 @@ class VehicleTechnicalLicenseSlovak2From2016Document implements IDocument
 	/** @var MotorGear */
 	protected $motorGear;
 
-	/** @var MotorGear */
+	/** @var Bodywork */
 	protected $bodywork;
 
 	public function getVehicle() : Vehicle
