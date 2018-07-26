@@ -15,7 +15,10 @@ trait TTempDir
 		} elseif (!is_writable($tempDir)) {
 			throw new InvalidArgumentException("Temporary directory '$tempDir' is not writable.");
 		}
-		@mkdir($tempDir . '/' . Strings::webalize(__CLASS__));
-		return $tempDir . '/' . Strings::webalize(__CLASS__);
+		$dir = $tempDir . '/' . Strings::webalize(__CLASS__);
+		if (!file_exists($dir)) {
+			mkdir($dir);
+		}
+		return $dir;
 	}
 }
