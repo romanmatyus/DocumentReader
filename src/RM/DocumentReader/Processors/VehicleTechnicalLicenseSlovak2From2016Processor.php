@@ -86,7 +86,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 
 			$s = implode(' ', $rData);
 
-			if ($i === 0 AND $s !== 'zakladne udaje o evidenci')
+			if ($i === 0 && $s !== 'zakladne udaje o evidenci')
 				break;
 			$i++;
 
@@ -113,14 +113,14 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 			$s = implode(' ', $rData);
 			$sOriginal = implode(' ', $originalData);
 
-			if ($i === 0 AND $s !== 'vozidlo')
+			if ($i === 0 && $s !== 'vozidlo')
 				break;
 			$i++;
 
-			if (preg_match('/^.*druh\s(?<kind>.+)$/', $s, $o) AND $i < 3) {
+			if (preg_match('/^.*druh\s(?<kind>.+)$/', $s, $o) && $i < 3) {
 				$document->getVehicle()->setKind(Strings::upper($o['kind']));
 			} elseif (preg_match('/^.*kategoria\s(?<category>[^\s]+).*vin.*\s(?<vin>\w{9,17})$/', $s, $o)) {
-				if (!empty($document->getVehicle()->getVin() AND $document->getVehicle()->getVin() !== Strings::upper($o['vin'])))
+				if (!empty($document->getVehicle()->getVin() && $document->getVehicle()->getVin() !== Strings::upper($o['vin'])))
 					throw new InvalidArgumentException("Documents is not for same vehicle. VIN are " . $document->getVehicle()->getVin() . " and " . Strings::upper($o['vin']) . ".");
 				$document->getVehicle()->setVin(Strings::upper($o['vin']));
 				$document->getVehicle()->setCategory(Strings::upper($o['category']));
@@ -192,7 +192,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 			} elseif (preg_match('/druh\s*paliva\s*\/\s*zdroj\s*energie\s*(?<fuelType>.*)/', $s, $o)) {
 				$document->getMotorGear()->setFuelType(Strings::upper($o['fuelType']));
 			} elseif (preg_match('/20\s*prevodovka.*pocet.*stupnov\s*(?<gearType>[^\s]+)\s*\/?\s*(?<gearsNumber>\d+)/', $s, $o)) {
-				if (strpos($s, "cvti 1") AND $o['gearType'] === "cvti") {
+				if (strpos($s, "cvti 1") && $o['gearType'] === "cvti") {
 					$o['gearType'] = "cvt";
 				}
 				$document->getMotorGear()->setGearType(Strings::upper($o['gearType']));
@@ -208,7 +208,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 				$o = str_replace(' . LTD . , ', '. LTD,', $o);
 				$o = str_replace(' , ', ',', $o);
 				$document->getBodywork()->setManufacturer($o);
-			} elseif (preg_match('/24\s*vyrobne\s*cislo\s*(?<number>.+)/', $s, $o) AND strlen($o['number'])) {
+			} elseif (preg_match('/24\s*vyrobne\s*cislo\s*(?<number>.+)/', $s, $o) && strlen($o['number'])) {
 				$document->getBodywork()->setNumber(Strings::upper($o['number']));
 			} elseif (preg_match('/25.*pocet\s*miest.*nudzovych\s*(?<seats>\d+)\s*(\/|7)\s*(?<seatsEmergency>[\d-]+)/', $s, $o)) {
 				$document->getBodywork()->setSeats($o['seats']);
@@ -249,7 +249,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 		$rows = [];
 		$activeRow = NULL;
 		for ($i=min($usedY);$i<=max($usedY);$i++) {
-			if (in_array($i, $usedY) AND $activeRow === NULL) {
+			if (in_array($i, $usedY) && $activeRow === NULL) {
 				$activeRow = (object) [
 					'minY' => $i,
 					'maxY' => $i,
@@ -279,7 +279,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 			foreach ($this->getFirstColRows($image) as $row) {
 				$rowData = [];
 				foreach ($this->getFirstColItems($image) as $item) {
-					if ($item->y >= $row->minY AND $item->y <= $row->maxY) {
+					if ($item->y >= $row->minY && $item->y <= $row->maxY) {
 						$rowData[$item->x] = $item;
 					}
 				}
@@ -295,7 +295,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 		$firstCol = $this->getFirstCol($source);
 		$items = [];
 		foreach ($this->getItems($source) as $item) {
-			if ($item->x >= $firstCol->minX AND $item->x <= $firstCol->maxX) {
+			if ($item->x >= $firstCol->minX && $item->x <= $firstCol->maxX) {
 				$items[] = $item;
 			}
 		}
