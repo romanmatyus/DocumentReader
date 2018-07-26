@@ -117,13 +117,13 @@ class MotorGear
 		return $this->fuelType;
 	}
 
-	public function setPowerRatio(string $powerRatio) : MotorGear
+	public function setPowerRatio(float $powerRatio) : MotorGear
 	{
 		$this->powerRatio = $powerRatio;
 		return $this;
 	}
 
-	public function getPowerRatio() :? string
+	public function getPowerRatio() :? float
 	{
 		return $this->powerRatio;
 	}
