@@ -108,11 +108,9 @@ class DocumentReader
 
 		$count = 0;
 		$regex  = '/\/Count\s+(\d+)/';
-		$regex2 = '/\/Page\W*(\d+)/';
-		$regex3 = '/\/N\s+(\d+)/';
 
 		if(preg_match_all($regex, $content, $matches))
-				$count = max($matches);
+			$count = max($matches);
 
 		return (int) $count;
 	}
