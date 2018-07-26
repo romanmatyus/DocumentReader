@@ -1,0 +1,53 @@
+language: php
+
+sudo: false
+
+cache:
+    directories:
+        - $HOME/.composer/cache
+
+env:
+    matrix:
+        - COMPOSER_EXTRA_ARGS=""
+        - COMPOSER_EXTRA_ARGS="--prefer-lowest  --prefer-stable"
+
+
+php:
+    - 7.0
+    - 7.1
+    - hhvm
+
+matrix:
+    allow_failures:
+        - php: hhvm
+
+before_install:
+    - composer self-update
+
+install:
+    - mkdir -p vendor/bin
+    - composer update --no-interaction --prefer-source $COMPOSER_EXTRA_ARGS
+
+before_script:
+    - ./vendor/bin/parallel-lint -e php,phpt --exclude vendor .
+    - composer create-project nette/code-checker code-checker ~2.3 --no-interaction --prefer-source
+    - php code-checker/src/code-checker.php -d src
+    - php code-checker/src/code-checker.php -d tests
+    - |
+        printf "visionClient:\n\tprojectId: $PROJECT_ID\n" > tests/secret.neon
+    - |
+        printf $GOOGLE_OWNER > tests/secret-google-owner.json
+    - if [[ $TRAVIS_PHP_VERSION == '7.1' ]] && [[ $COMPOSER_EXTRA_ARGS == '' ]]; then FLAGS="-d zend_extension=xdebug.so --coverage coverage.xml --coverage-src src"; fi;
+
+script:
+    - vendor/bin/tester tests -s -p php -c tests/php-unix.ini $FLAGS
+
+after_script:
+    - |
+        if [[ $TRAVIS_PHP_VERSION == '7.1' ]] && [[ $COMPOSER_EXTRA_ARGS == '' ]]; then
+            wget https://scrutinizer-ci.com/ocular.phar
+            php ocular.phar code-coverage:upload --format=php-clover coverage.xml
+        fi
+
+after_failure:
+    - for i in $(find tests -name \*.actual); do echo "--- $i"; cat $i; echo; echo; done

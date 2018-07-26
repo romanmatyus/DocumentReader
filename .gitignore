@@ -1,0 +1,7 @@
+vendor
+composer.lock
+code-checker
+output/
+temp*
+tests/secret*
+tests/assets/VehicleTechnicalLicenseSlovak2From2016*
