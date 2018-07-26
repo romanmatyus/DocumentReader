@@ -92,7 +92,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 				break;
 			$i++;
 
-			if (preg_match("/^.*vin.*\s(?<vin>\w{9,17})$/", $s, $o)) {
+			if (preg_match('/^.*vin.*\s(?<vin>\w{9,17})$/', $s, $o)) {
 				$document->getVehicle()->setVin(Strings::upper($o['vin']));
 			}
 		}
@@ -120,18 +120,18 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 				break;
 			$i++;
 
-			if (preg_match("/^.*druh\s(?<kind>.+)$/", $s, $o) && $i < 3) {
+			if (preg_match('/^.*druh\s(?<kind>.+)$/', $s, $o) && $i < 3) {
 				$document->getVehicle()->setKind(Strings::upper($o['kind']));
-			} elseif (preg_match("/^.*kategoria\s(?<category>[^\s]+).*vin.*\s(?<vin>\w{9,17})$/", $s, $o)) {
+			} elseif (preg_match('/^.*kategoria\s(?<category>[^\s]+).*vin.*\s(?<vin>\w{9,17})$/', $s, $o)) {
 				if (!empty($document->getVehicle()->getVin() && $document->getVehicle()->getVin() !== Strings::upper($o['vin'])))
 					throw new InvalidArgumentException("Documents is not for same vehicle. VIN are " . $document->getVehicle()->getVin() . " and " . Strings::upper($o['vin']) . ".");
 				$document->getVehicle()->setVin(Strings::upper($o['vin']));
 				$document->getVehicle()->setCategory(Strings::upper($o['category']));
-			} elseif (preg_match("/^.*znacka\s(?<manufacturer>.*)$/", $s, $o)) {
+			} elseif (preg_match('/^.*znacka\s(?<manufacturer>.*)$/', $s, $o)) {
 				$document->getVehicle()->setManufacturer(Strings::upper($o['manufacturer']));
-			} elseif (preg_match("/^.*obchodny\s*nazov\s(?<marketName>.*)$/", $s, $o)) {
+			} elseif (preg_match('/^.*obchodny\s*nazov\s(?<marketName>.*)$/', $s, $o)) {
 				$document->getVehicle()->setMarketName(Strings::upper($o['marketName']));
-			} elseif (preg_match("/^.*typ\s*\/\s*variant\s*\/\s*verzia\s(?<content>.*)$/", $s, $o)) {
+			} elseif (preg_match('/^.*typ\s*\/\s*variant\s*\/\s*verzia\s(?<content>.*)$/', $s, $o)) {
 				$o = explode('/', $o['content']);
 				$removeSpace = function ($s) {
 					return Strings::replace($s, '~\s~i', '');
@@ -141,12 +141,12 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 					$document->getVehicle()->setVariant($removeSpace(Strings::upper($o[1])));
 				if (isset($o[2]))
 					$document->getVehicle()->setVersion($removeSpace(Strings::upper($o[2])));
-			} elseif (preg_match("/^\s*9\s*vyrobca\s*vozidla\s*\(\s*podvozku\s*\)\s*(?<manufacturerChassis>.*)$/", $s, $o)) {
+			} elseif (preg_match('/^\s*9\s*vyrobca\s*vozidla\s*\(\s*podvozku\s*\)\s*(?<manufacturerChassis>.*)$/', $s, $o)) {
 				$o = Strings::upper($o['manufacturerChassis']);
 				$o = str_replace(' . LTD . , ', '. LTD,', $o);
 				$o = str_replace(' , ', ',', $o);
 				$document->getVehicle()->setManufacturerChassis($o);
-			} elseif (preg_match("/^\s*10.*cislo.*schvalenia\s*es\s*(?<approvalNumber>.*)$/", $s, $o)) {
+			} elseif (preg_match('/^\s*10.*cislo.*schvalenia\s*es\s*(?<approvalNumber>.*)$/', $s, $o)) {
 				$o = $o['approvalNumber'];
 				$o = Strings::trim($o);
 				$o = str_replace(' ', '', $o);
@@ -160,14 +160,14 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 					}
 					$_o = explode('*', $o);
 					if ($_o[1][strlen($_o[1])-3] !== '/') {
-					    $_o[1] = substr($_o[1], 0, -3) . '/' . substr($_o[1], -2);
-					    $o = implode('*', $_o);
+						$_o[1] = substr($_o[1], 0, -3) . '/' . substr($_o[1], -2);
+						$o = implode('*', $_o);
 					}
 				}
 				if ($o !== '-')
 					$document->getVehicle()->setApprovalNumber($o);
 
-			} elseif (preg_match("/^\s*11.*datum.*schvalenia\s*es\s*(?<approvalDate>.*)$/", $s, $o)) {
+			} elseif (preg_match('/^\s*11.*datum.*schvalenia\s*es\s*(?<approvalDate>.*)$/', $s, $o)) {
 				$o = $o['approvalDate'];
 				if ((int) $o) {
 					list($d, $m, $y) = explode('.', $o);
@@ -177,56 +177,56 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 
 					$document->getVehicle()->setApprovalDate(new DateTimeImmutable($y . '-' . $m . '-' . $d));
 				}
-			} elseif (preg_match("/^\s*12\s*vyrobca\s*motora\s*(?<manufacturer>.*)$/", $s, $o)) {
+			} elseif (preg_match('/^\s*12\s*vyrobca\s*motora\s*(?<manufacturer>.*)$/', $s, $o)) {
 				$o = Strings::upper($o['manufacturer']);
 				$o = str_replace(' . LTD . , ', '. LTD,', $o);
 				$o = str_replace(' , ', ',', $o);
 				$document->getMotorGear()->setManufacturer($o);
-			} elseif (preg_match("/identifikacne\s*cislo\s*motora\s*\(\s*typ\s*\)\s(?<id>.*)$/", $s, $o)) {
+			} elseif (preg_match('/identifikacne\s*cislo\s*motora\s*\(\s*typ\s*\)\s(?<id>.*)$/', $s, $o)) {
 				$o = Strings::upper($o['id']);
 				$o = Strings::trim($o);
 				$document->getMotorGear()->setId($o);
-			} elseif (preg_match("/zdvihovy\s*objem\s*valcov*\s(?<value>[\d ]+).*katalyzator\s*(?<catalyst>\w+)$/", $s, $o)) {
+			} elseif (preg_match('/zdvihovy\s*objem\s*valcov*\s(?<value>[\d ]+).*katalyzator\s*(?<catalyst>\w+)$/', $s, $o)) {
 				$document->getMotorGear()->setValue((float) Strings::trim(Strings::upper(str_replace(' ', '', $o['value']))));
 				$document->getMotorGear()->setCatalyst(Strings::trim(Strings::upper($o['catalyst'])));
-			} elseif (preg_match("/najvacsi\s*vykon\s*motora.*otacky\s*(?<power>[0-9 \.,]*)[^0-9]*(?<speed>\d+)/", $s, $o)) {
+			} elseif (preg_match('/najvacsi\s*vykon\s*motora.*otacky\s*(?<power>[0-9 \.,]*)[^0-9]*(?<speed>\d+)/', $s, $o)) {
 				$document->getMotorGear()->setPower((float) str_replace(',', '.', Strings::replace($o['power'], '~\s~i', '')));
 				$document->getMotorGear()->setSpeed((int) $o['speed']);
-			} elseif (preg_match("/druh\s*paliva\s*\/\s*zdroj\s*energie\s*(?<fuelType>.*)/", $s, $o)) {
+			} elseif (preg_match('/druh\s*paliva\s*\/\s*zdroj\s*energie\s*(?<fuelType>.*)/', $s, $o)) {
 				$document->getMotorGear()->setFuelType(Strings::upper($o['fuelType']));
-			} elseif (preg_match("/20\s*prevodovka.*pocet.*stupnov\s*(?<gearType>[^\s]+)\s*\/?\s*(?<gearsNumber>\d+)/", $s, $o)) {
+			} elseif (preg_match('/20\s*prevodovka.*pocet.*stupnov\s*(?<gearType>[^\s]+)\s*\/?\s*(?<gearsNumber>\d+)/', $s, $o)) {
 				if (strpos($s, "cvti 1") && $o['gearType'] === "cvti") {
 					$o['gearType'] = "cvt";
 				}
 				$document->getMotorGear()->setGearType(Strings::upper($o['gearType']));
 				$document->getMotorGear()->setGearsNumber((int) $o['gearsNumber']);
-			} elseif (preg_match("/\s*Druh.*typ\s*\)\s*(?<type>.*)/", $sOriginal, $o)) {
+			} elseif (preg_match('/\s*Druh.*typ\s*\)\s*(?<type>.*)/', $sOriginal, $o)) {
 				$o = Strings::upper($o['type']);
 				$o = str_replace(' .', '.', $o);
 				$document->getBodywork()->setType($o);
-			} elseif (preg_match("/22.*arba\s*(?<color>.+)/", $sOriginal, $o)) {
+			} elseif (preg_match('/22.*arba\s*(?<color>.+)/', $sOriginal, $o)) {
 				$document->getBodywork()->setColor(Strings::upper($o['color']));
-			} elseif (preg_match("/^\s*23\s*vyrobca\s*(?<manufacturer>.*)$/", $s, $o)) {
+			} elseif (preg_match('/^\s*23\s*vyrobca\s*(?<manufacturer>.*)$/', $s, $o)) {
 				$o = Strings::upper($o['manufacturer']);
 				$o = str_replace(' . LTD . , ', '. LTD,', $o);
 				$o = str_replace(' , ', ',', $o);
 				$document->getBodywork()->setManufacturer($o);
-			} elseif (preg_match("/24\s*vyrobne\s*cislo\s*(?<number>.+)/", $s, $o) && strlen($o['number'])) {
+			} elseif (preg_match('/24\s*vyrobne\s*cislo\s*(?<number>.+)/', $s, $o) && strlen($o['number'])) {
 				$document->getBodywork()->setNumber(Strings::upper($o['number']));
-			} elseif (preg_match("/25.*pocet\s*miest.*nudzovych\s*(?<seats>\d+)\s*(\/|7)\s*(?<seatsEmergency>[\d-]+)/", $s, $o)) {
+			} elseif (preg_match('/25.*pocet\s*miest.*nudzovych\s*(?<seats>\d+)\s*(\/|7)\s*(?<seatsEmergency>[\d-]+)/', $s, $o)) {
 				$document->getBodywork()->setSeats($o['seats']);
 				if ($o['seatsEmergency'] !== "-") {
 					$document->getBodywork()->setSeatsEmergency((int) $o['seatsEmergency']);
 				}
-			} elseif (preg_match("/25.*pocet\s*miest.*statie\s*(?<placeStands>[^\s]+).*25.*pocet\s*lozok\s*(?<beds>\d+)/", $s, $o)) {
+			} elseif (preg_match('/25.*pocet\s*miest.*statie\s*(?<placeStands>[^\s]+).*25.*pocet\s*lozok\s*(?<beds>\d+)/', $s, $o)) {
 				$document->getBodywork()->setPlaceStands((int) $o['placeStands']);
 				$document->getBodywork()->setBeds((int) $o['beds']);
-			} elseif (preg_match("/26\s*zatazenie.*strechy\s*(?<roofLoad>.+)$/", $s, $o)) {
-				if (preg_match("/(?<roofLoad>\d+)\s*kg/", $o['roofLoad'], $o))
+			} elseif (preg_match('/26\s*zatazenie.*strechy\s*(?<roofLoad>.+)$/', $s, $o)) {
+				if (preg_match('/(?<roofLoad>\d+)\s*kg/', $o['roofLoad'], $o))
 				$document->getBodywork()->setRoofLoad($o['roofLoad']);
-			} elseif (preg_match("/27\s*objem\s*skrine.+cisterny\s*(?<volume>\d+)/", $s, $o)) {
+			} elseif (preg_match('/27\s*objem\s*skrine.+cisterny\s*(?<volume>\d+)/', $s, $o)) {
 				$document->getBodywork()->setVolume($o['volume']);
-			} elseif (preg_match("/28.*objem\s*palivovej\s*nadrze\s*(?<fuelVolume>\d+)$/", $s, $o)) {
+			} elseif (preg_match('/28.*objem\s*palivovej\s*nadrze\s*(?<fuelVolume>\d+)$/', $s, $o)) {
 				$document->getBodywork()->setVolumeFuel($o['fuelVolume']);
 			}
 		}
@@ -275,7 +275,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 	private function getFirstColItemsByRows(Image $image) : array
 	{
 		return $this->cache->load('getFirstColItemsByRows-' . md5((string) $image), function (&$dependencies) use ($image) {
-			$dependencies = [ 
+			$dependencies = [
 				Cache::EXPIRE => '7 days',
 				Cache::SLIDING => true,
 			];
@@ -404,7 +404,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 	private function parseByVision(Image $image) : array
 	{
 		return $this->cache->load('parseByVision-' . md5((string) $image), function (&$dependencies) use ($image) {
-			$dependencies = [ 
+			$dependencies = [
 				Cache::EXPIRE => '7 days',
 				Cache::SLIDING => true,
 			];
