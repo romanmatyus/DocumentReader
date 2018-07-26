@@ -176,6 +176,7 @@ class Perspective
 
 	private function findDestinationCorners(array $originalCorners) :? array
 	{
+		$out = [];
 		$out['topLeft'] = $originalCorners['topLeft'];
 
 		$width = (int) max(
