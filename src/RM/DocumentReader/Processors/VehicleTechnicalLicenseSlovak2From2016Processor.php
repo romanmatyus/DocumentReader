@@ -73,7 +73,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 		return $document;
 	}
 
-	function analyzeFirstPageVehicleRegistration(Image $source, VehicleTechnicalLicenseSlovak2From2016Document &$document) : VehicleTechnicalLicenseSlovak2From2016Document
+	private function analyzeFirstPageVehicleRegistration(Image $source, VehicleTechnicalLicenseSlovak2From2016Document &$document) : VehicleTechnicalLicenseSlovak2From2016Document
 	{
 		$i = 0;
 		foreach ($this->getFirstColItemsByRows($source) as $row) {
@@ -85,10 +85,8 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 			}
 
 			$s = implode(' ', $rData);
-			$sLower = implode(' ', $lowerData);
 
-
-			if ($i === 0 && $s !== 'zakladne udaje o evidenci')
+			if ($i === 0 AND $s !== 'zakladne udaje o evidenci')
 				break;
 			$i++;
 
@@ -99,7 +97,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 		return $document;
 	}
 
-	function analyzeSecondPageVehicleRegistration(Image $source, VehicleTechnicalLicenseSlovak2From2016Document &$document) :? VehicleTechnicalLicenseSlovak2From2016Document
+	private function analyzeSecondPageVehicleRegistration(Image $source, VehicleTechnicalLicenseSlovak2From2016Document &$document) :? VehicleTechnicalLicenseSlovak2From2016Document
 	{
 		$i = 0;
 		foreach ($this->getFirstColItemsByRows($source) as $row) {
@@ -114,16 +112,15 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 
 			$s = implode(' ', $rData);
 			$sOriginal = implode(' ', $originalData);
-			$sLower = implode(' ', $lowerData);
 
-			if ($i === 0 && $s !== 'vozidlo')
+			if ($i === 0 AND $s !== 'vozidlo')
 				break;
 			$i++;
 
-			if (preg_match('/^.*druh\s(?<kind>.+)$/', $s, $o) && $i < 3) {
+			if (preg_match('/^.*druh\s(?<kind>.+)$/', $s, $o) AND $i < 3) {
 				$document->getVehicle()->setKind(Strings::upper($o['kind']));
 			} elseif (preg_match('/^.*kategoria\s(?<category>[^\s]+).*vin.*\s(?<vin>\w{9,17})$/', $s, $o)) {
-				if (!empty($document->getVehicle()->getVin() && $document->getVehicle()->getVin() !== Strings::upper($o['vin'])))
+				if (!empty($document->getVehicle()->getVin() AND $document->getVehicle()->getVin() !== Strings::upper($o['vin'])))
 					throw new InvalidArgumentException("Documents is not for same vehicle. VIN are " . $document->getVehicle()->getVin() . " and " . Strings::upper($o['vin']) . ".");
 				$document->getVehicle()->setVin(Strings::upper($o['vin']));
 				$document->getVehicle()->setCategory(Strings::upper($o['category']));
@@ -195,7 +192,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 			} elseif (preg_match('/druh\s*paliva\s*\/\s*zdroj\s*energie\s*(?<fuelType>.*)/', $s, $o)) {
 				$document->getMotorGear()->setFuelType(Strings::upper($o['fuelType']));
 			} elseif (preg_match('/20\s*prevodovka.*pocet.*stupnov\s*(?<gearType>[^\s]+)\s*\/?\s*(?<gearsNumber>\d+)/', $s, $o)) {
-				if (strpos($s, "cvti 1") && $o['gearType'] === "cvti") {
+				if (strpos($s, "cvti 1") AND $o['gearType'] === "cvti") {
 					$o['gearType'] = "cvt";
 				}
 				$document->getMotorGear()->setGearType(Strings::upper($o['gearType']));
@@ -211,7 +208,7 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 				$o = str_replace(' . LTD . , ', '. LTD,', $o);
 				$o = str_replace(' , ', ',', $o);
 				$document->getBodywork()->setManufacturer($o);
-			} elseif (preg_match('/24\s*vyrobne\s*cislo\s*(?<number>.+)/', $s, $o) && strlen($o['number'])) {
+			} elseif (preg_match('/24\s*vyrobne\s*cislo\s*(?<number>.+)/', $s, $o) AND strlen($o['number'])) {
 				$document->getBodywork()->setNumber(Strings::upper($o['number']));
 			} elseif (preg_match('/25.*pocet\s*miest.*nudzovych\s*(?<seats>\d+)\s*(\/|7)\s*(?<seatsEmergency>[\d-]+)/', $s, $o)) {
 				$document->getBodywork()->setSeats($o['seats']);
@@ -249,12 +246,10 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 			}
 		}
 
-		$i = 0;
-		$j = 0;
 		$rows = [];
 		$activeRow = NULL;
 		for ($i=min($usedY);$i<=max($usedY);$i++) {
-			if (in_array($i, $usedY) && $activeRow === NULL) {
+			if (in_array($i, $usedY) AND $activeRow === NULL) {
 				$activeRow = (object) [
 					'minY' => $i,
 					'maxY' => $i,
@@ -317,7 +312,6 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 		}
 
 		$usedX = array_unique($usedX);
-		$i = 0;
 		for ($i=min($usedX); $i<max($usedX);$i++) {
 			if (!in_array($i, $usedX))
 				break;
@@ -408,9 +402,8 @@ class VehicleTechnicalLicenseSlovak2From2016Processor implements IProcessor
 				Cache::EXPIRE => '7 days',
 				Cache::SLIDING => true,
 			];
-			var_dump('Call Google Vision');
-			$image = $this->visionClient->image((string) $image, ['DOCUMENT_TEXT_DETECTION']);
-			$result = $this->visionClient->annotate($image);
+			$visionImage = $this->visionClient->image((string) $image, ['DOCUMENT_TEXT_DETECTION']);
+			$result = $this->visionClient->annotate($visionImage);
 
 			return (array) $result->text();
 		});
