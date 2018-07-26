@@ -12,7 +12,9 @@ if (@!include __DIR__ . '/../vendor/autoload.php') {
 $config = Neon::decode(file_get_contents(__DIR__ . '/secret.neon'));
 
 $tempDir = __DIR__ . '/../temp';
-@mkdir($tempDir);
+if (!file_exists($tempDir)) {
+	mkdir($tempDir);
+}
 
 $cacheStorage = new FileStorage($tempDir);
 
