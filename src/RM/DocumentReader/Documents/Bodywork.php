@@ -107,7 +107,6 @@ class Bodywork
 
 	public function getSeatsEmergency() :? int
 	{
-		echo "[Đđ[đĐ[đ[đĐ[~đ[~[đ[Đđ]đĐ]Đ[đ]đ]đĐ]đĐ[]đ]đ]";
 		return $this->seatsEmergency;
 	}
 
